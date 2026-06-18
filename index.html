@@ -1137,22 +1137,6 @@
     }
 
 
-    /* ─── VIDEO AUDIO HINT ──────────────────────────────── */
-    .video-audio-hint {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      z-index: 5;
-      pointer-events: none;
-      transition: opacity 0.5s;
-    }
-    .video-audio-hint.hidden { opacity: 0; }
-
     /* ─── FADE-IN ANIMATION ─────────────────────────────── */
     .fade-up {
       opacity: 0;
@@ -1263,10 +1247,9 @@
 
     <div class="hero-visual">
       <div class="hero-video-wrap">
-        <video controls loop playsinline src="video-israel.mp4" style="border-radius:inherit;" preload="metadata" data-autoplay="hero">
+        <video controls loop playsinline src="video-israel.mp4" style="border-radius:inherit;" preload="metadata" data-autoplay="hero" controlsList="nodownload noremoteplayback" disablePictureInPicture>
           <p style="color:white; text-align:center; padding:20px;">Vídeo não disponível no momento</p>
         </video>
-        <span class="video-audio-hint">🔊 Clique para ativar o áudio</span>
       </div>
     </div>
   </div>
@@ -1527,7 +1510,7 @@
     <div class="depo-wrap">
       <div class="depo-card">
         <div class="depo-video-placeholder">
-          <video controls loop playsinline src="video-depoimento.mp4" preload="metadata" data-autoplay="depo">
+          <video controls loop playsinline src="video-depoimento.mp4" preload="metadata" data-autoplay="depo" controlsList="nodownload noremoteplayback" disablePictureInPicture>
             <p style="color:white; text-align:center; padding:20px;">Vídeo não disponível no momento</p>
           </video>
         </div>
@@ -1719,18 +1702,6 @@
 
   document.querySelectorAll('video[data-autoplay]').forEach(function(video) {
     videoObs.observe(video);
-  });
-
-  /* Audio hint: hide when video plays */
-  document.querySelectorAll('video[data-autoplay]').forEach(function(video) {
-    video.addEventListener('play', function() {
-      var hint = video.parentElement.querySelector('.video-audio-hint');
-      if (hint) { hint.classList.add('hidden'); }
-    });
-    video.addEventListener('pause', function() {
-      var hint = video.parentElement.querySelector('.video-audio-hint');
-      if (hint) { hint.classList.remove('hidden'); }
-    });
   });
 
 </script>
