@@ -1103,6 +1103,18 @@
       margin-top: 16px;
     }
 
+    #formFeedback { transition: opacity 0.3s; }
+    #formFeedback.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+    #formFeedback.error {
+      background: #fce4ec;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+    }
+
     .form-whatsapp {
       text-align: center;
       margin-top: 28px;
@@ -1430,7 +1442,7 @@
           </li>
         </ul>
       </div>
-      <div class="kit-visual">
+      <div class="kit-visual" style="display:none;">
         <!-- Substituir pela foto do Kit Home RapChef quando disponível -->
         <div style="position:relative; z-index:1; text-align:center;">
           <p style="font-size:48px; margin-bottom:12px;">🧊</p>
@@ -1679,14 +1691,21 @@
           </div>
 
           <div class="form-submit">
-            <button type="submit" class="btn btn-submit">
+            <button type="submit" class="btn btn-submit" id="btnSubmit">
               Quero receber as informações do Modelo Home
             </button>
           </div>
+          <div id="formFeedback" style="display:none; margin-top:20px; padding:16px; border-radius:8px; font-size:14px; font-weight:600; text-align:center;"></div>
           <p class="form-microcopy">🔒 Seus dados estão protegidos. Não compartilhamos com terceiros. Retorno em até 24h.</p>
         </form>
 
-      </div>
+        <!-- Fallback WhatsApp caso o formulário offline -->
+        <div class="form-whatsapp">
+          <p>Prefere falar agora? Mande uma mensagem no WhatsApp</p>
+          <a href="https://wa.me/5511999999999?text=Olá! Quero saber mais sobre o Modelo Home RapChef" target="_blank" class="btn btn-whatsapp" style="font-size:13px;">
+            Fale conosco no WhatsApp
+          </a>
+        </div>
     </div>
   </div>
 </section>
@@ -1803,6 +1822,85 @@
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   fadeEls.forEach(function(el) { fadeObs.observe(el); });
+
+  /* ─── FORMULÁRIO → GOOGLE SHEETS ──────────────────────── */
+
+  /*
+   * ============================================================
+   *  PASSO A PASSO PARA ATIVAR O FORMULÁRIO
+   * ============================================================
+   * 1. Abra a planilha: https://docs.google.com/spreadsheets/d/1XQ4_2OhvExfGsg5kLGCQSawYAL4Ka1yXosULiQ-maMg/
+   * 2. Vá em Extensões → Apps Script
+   * 3. Cole o conteúdo do arquivo "Codigo-Apps-Script.gs"
+   * 4. Salve (Ctrl+S) e clique em "Implantar" → "Nova implantação"
+   * 5. Tipo: "Web app", Executar como: "Eu", Acesso: "Qualquer pessoa"
+   * 6. Clique em "Implantar" e copie a URL gerada
+   * 7. Cole a URL dentro das aspas na variável SHEETS_WEBAPP_URL abaixo
+   * ============================================================
+   */
+  var SHEETS_WEBAPP_URL = ""; // ← Cole aqui a URL do Google Apps Script
+
+  function mostrarFeedback(tipo, msg) {
+    var el = document.getElementById('formFeedback');
+    if (!el) return;
+    el.className = tipo; // "success" ou "error"
+    el.textContent = msg;
+    el.style.display = 'block';
+    /* Rolagem suave até o feedback */
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  document.getElementById('leadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var btn = document.getElementById('btnSubmit');
+    var feedback = document.getElementById('formFeedback');
+    feedback.style.display = 'none';
+
+    /* Muda o botão para "Enviando..." */
+    var textoOriginal = btn.textContent;
+    btn.textContent = 'Enviando…';
+    btn.disabled = true;
+
+    /* Monta objeto com os dados */
+    var dados = {
+      nome:        document.getElementById('nome').value.trim(),
+      whatsapp:    document.getElementById('whatsapp').value.trim(),
+      cidade:      document.getElementById('cidade').value.trim(),
+      experiencia: document.getElementById('experiencia').value
+    };
+
+    /* Se a URL do web app foi configurada, envia via fetch */
+    if (SHEETS_WEBAPP_URL) {
+      fetch(SHEETS_WEBAPP_URL, {
+        method: 'POST',
+        mode: 'no-cors',  /* Necessário para Google Apps Script */
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      })
+      .then(function() {
+        /* Com 'no-cors', não conseguimos ler a resposta —
+           assumimos sucesso se não houve erro de rede */
+        mostrarFeedback('success', '✅ Recebemos seus dados! Entraremos em contato em até 24h.');
+        document.getElementById('leadForm').reset();
+      })
+      .catch(function() {
+        mostrarFeedback('error', '❌ Erro ao enviar. Tente novamente ou fale conosco pelo WhatsApp.');
+      })
+      .finally(function() {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+      });
+    } else {
+      /* Web app não configurado — fallback: mostra instruções */
+      mostrarFeedback(
+        'error',
+        '⏳ Formulário em configuração. Enquanto isso, fale conosco pelo WhatsApp.'
+      );
+      btn.textContent = textoOriginal;
+      btn.disabled = false;
+    }
+  });
 
 </script>
 
