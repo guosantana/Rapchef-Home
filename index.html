@@ -1683,10 +1683,15 @@
             <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required />
           </div>
 
+          <div class="form-group">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required />
+          </div>
+
           <div class="form-row">
             <div class="form-group">
               <label for="whatsapp">WhatsApp (com DDD) *</label>
-              <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 99999-9999" required />
+              <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 99999-9999" required autocomplete="tel" />
             </div>
             <div class="form-group">
               <label for="cidade">Cidade / Estado *</label>
@@ -1866,6 +1871,16 @@
   }
 
   /* Valida se a URL parece ser de um Web App do Google Apps Script */
+  /* Máscara WhatsApp BR: (XX) XXXX-XXXX ou (XX) XXXXX-XXXX */
+  document.getElementById('whatsapp').addEventListener('input', function() {
+    var d = this.value.replace(/\D/g, '').slice(0, 11);
+    if (d.length === 0) { this.value = ''; return; }
+    var fmt = '(' + d.slice(0, 2);
+    if (d.length > 2) fmt += ') ' + d.slice(2, d.length > 10 ? 7 : 6);
+    if (d.length > (d.length > 10 ? 7 : 6)) fmt += '-' + d.slice(d.length > 10 ? 7 : 6);
+    this.value = fmt;
+  });
+
   function urlSheetsValida(url) {
     return url && url.indexOf('script.google.com/macros/') !== -1;
   }
@@ -1883,10 +1898,29 @@
 
     var dados = {
       nome:        document.getElementById('nome').value.trim(),
+      email:       document.getElementById('email').value.trim(),
       whatsapp:    document.getElementById('whatsapp').value.trim(),
       cidade:      document.getElementById('cidade').value.trim(),
       experiencia: document.getElementById('experiencia').value
     };
+
+    /* Validação de e-mail */
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(dados.email)) {
+      mostrarFeedback('error', '⚠️ Digite um e-mail válido.');
+      btn.textContent = textoOriginal;
+      btn.disabled = false;
+      return;
+    }
+
+    /* Validação de WhatsApp: 10 ou 11 dígitos */
+    var wDigits = dados.whatsapp.replace(/\D/g, '');
+    if (wDigits.length < 10 || wDigits.length > 11) {
+      mostrarFeedback('error', '⚠️ WhatsApp inválido. Digite DDD + número (10 ou 11 dígitos).');
+      btn.textContent = textoOriginal;
+      btn.disabled = false;
+      return;
+    }
 
     if (urlSheetsValida(SHEETS_WEBAPP_URL)) {
       /* Usa um iframe oculto para evitar redirect (funciona com Google Apps Script) */
