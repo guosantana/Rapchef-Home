@@ -1904,10 +1904,13 @@
           btn.disabled = false;
           mostrarFeedback('success',
             '✅ <strong>Recebemos seus dados!</strong><br>' +
-            'Entraremos em contato em até 24h pelo WhatsApp.'
+            'Redirecionando para o WhatsApp...'
           );
           document.getElementById('leadForm').reset();
           if (typeof fbq === 'function') { fbq('track', 'Lead'); }
+          setTimeout(function() {
+            window.location.href = 'https://wa.me/5511968703256?text=Quero%20saber%20mais%20sobre%20o%20modelo%20Home%20da%20RapChef!';
+          }, 1500);
         };
       }
 
