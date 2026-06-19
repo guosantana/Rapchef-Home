@@ -1827,7 +1827,7 @@
 
   /*
    * ============================================================
-   *  PASSO A PASSO PARA ATIVAR O FORMULÁRIO
+   *  PASSO A PASSO PARA ATIVAR O ENVIO PARA GOOGLE SHEETS
    * ============================================================
    * 1. Abra a planilha: https://docs.google.com/spreadsheets/d/1XQ4_2OhvExfGsg5kLGCQSawYAL4Ka1yXosULiQ-maMg/
    * 2. Vá em Extensões → Apps Script
@@ -1835,19 +1835,25 @@
    * 4. Salve (Ctrl+S) e clique em "Implantar" → "Nova implantação"
    * 5. Tipo: "Web app", Executar como: "Eu", Acesso: "Qualquer pessoa"
    * 6. Clique em "Implantar" e copie a URL gerada
+   *    (ELA COMEÇA COM: https://script.google.com/macros/s/...)
    * 7. Cole a URL dentro das aspas na variável SHEETS_WEBAPP_URL abaixo
+   *    EXEMPLO: var SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKf.../exec";
    * ============================================================
    */
-  var SHEETS_WEBAPP_URL = "https://docs.google.com/spreadsheets/d/1XQ4_2OhvExfGsg5kLGCQSawYAL4Ka1yXosULiQ-maMg/edit?gid=0#gid=0"; // ← Cole aqui a URL do Google Apps Script
+  var SHEETS_WEBAPP_URL = ""; // ← COLE AQUI a URL do Web App (começa com https://script.google.com/macros/s/...)
 
   function mostrarFeedback(tipo, msg) {
     var el = document.getElementById('formFeedback');
     if (!el) return;
-    el.className = tipo; // "success" ou "error"
-    el.textContent = msg;
+    el.className = tipo;
+    el.innerHTML = msg;
     el.style.display = 'block';
-    /* Rolagem suave até o feedback */
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* Valida se a URL parece ser de um Web App do Google Apps Script */
+  function urlSheetsValida(url) {
+    return url && url.indexOf('script.google.com/macros/') !== -1;
   }
 
   document.getElementById('leadForm').addEventListener('submit', function(e) {
@@ -1857,12 +1863,10 @@
     var feedback = document.getElementById('formFeedback');
     feedback.style.display = 'none';
 
-    /* Muda o botão para "Enviando..." */
     var textoOriginal = btn.textContent;
     btn.textContent = 'Enviando…';
     btn.disabled = true;
 
-    /* Monta objeto com os dados */
     var dados = {
       nome:        document.getElementById('nome').value.trim(),
       whatsapp:    document.getElementById('whatsapp').value.trim(),
@@ -1870,32 +1874,78 @@
       experiencia: document.getElementById('experiencia').value
     };
 
-    /* Se a URL do web app foi configurada, envia via fetch */
-    if (SHEETS_WEBAPP_URL) {
-      fetch(SHEETS_WEBAPP_URL, {
-        method: 'POST',
-        mode: 'no-cors',  /* Necessário para Google Apps Script */
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
-      })
-      .then(function() {
-        /* Com 'no-cors', não conseguimos ler a resposta —
-           assumimos sucesso se não houve erro de rede */
-        mostrarFeedback('success', '✅ Recebemos seus dados! Entraremos em contato em até 24h.');
-        document.getElementById('leadForm').reset();
-      })
-      .catch(function() {
-        mostrarFeedback('error', '❌ Erro ao enviar. Tente novamente ou fale conosco pelo WhatsApp.');
-      })
-      .finally(function() {
-        btn.textContent = textoOriginal;
-        btn.disabled = false;
+    if (urlSheetsValida(SHEETS_WEBAPP_URL)) {
+      /* Usa um iframe oculto para evitar redirect (funciona com Google Apps Script) */
+      var iframeId = 'gsSubmitFrame';
+      var iframe = document.getElementById(iframeId);
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = iframeId;
+        iframe.name = iframeId;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        /* Escuta o carregamento do iframe para saber quando terminou */
+        iframe.onload = function() {
+          btn.textContent = textoOriginal;
+          btn.disabled = false;
+          mostrarFeedback('success',
+            '✅ <strong>Recebemos seus dados!</strong><br>' +
+            'Entraremos em contato em até 24h pelo WhatsApp.'
+          );
+          document.getElementById('leadForm').reset();
+        };
+      }
+
+      /* Cria um form temporário com target=iframe para evitar refresh da página */
+      var tempForm = document.createElement('form');
+      tempForm.method = 'POST';
+      tempForm.action = SHEETS_WEBAPP_URL;
+      tempForm.target = iframeId;
+      tempForm.style.display = 'none';
+
+      /* Adiciona os campos como inputs ocultos */
+      Object.keys(dados).forEach(function(key) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;       /* ← Importante! O Apps Script usa e.parameter.nome */
+        input.value = dados[key];
+        tempForm.appendChild(input);
       });
-    } else {
-      /* Web app não configurado — fallback: mostra instruções */
+
+      document.body.appendChild(tempForm);
+      tempForm.submit();
+
+      /* Timeout de segurança: se o iframe não carregar em 10s, libera o botão */
+      setTimeout(function() {
+        if (btn.disabled) {
+          btn.textContent = textoOriginal;
+          btn.disabled = false;
+        }
+      }, 10000);
+
+      /* Remove o form temporário após o envio */
+      setTimeout(function() {
+        if (tempForm.parentNode) tempForm.parentNode.removeChild(tempForm);
+      }, 2000);
+
+    } else if (SHEETS_WEBAPP_URL && SHEETS_WEBAPP_URL.indexOf('google.com/spreadsheets') !== -1) {
+      /* Usuário colocou a URL da planilha em vez da URL do Web App */
       mostrarFeedback(
         'error',
-        '⏳ Formulário em configuração. Enquanto isso, fale conosco pelo WhatsApp.'
+        '❌ <strong>URL incorreta!</strong><br>' +
+        'Você colocou o link da planilha, mas precisa colar a <strong>URL do Web App</strong>.<br>' +
+        'Siga o passo a passo no arquivo <strong>Codigo-Apps-Script.gs</strong>.<br>' +
+        'A URL correta começa com: <code>https://script.google.com/macros/s/...</code>'
+      );
+      btn.textContent = textoOriginal;
+      btn.disabled = false;
+    } else {
+      /* URL vazia — não configurada */
+      mostrarFeedback(
+        'error',
+        '⏳ <strong>Formulário em configuração.</strong><br>' +
+        'Para ativar, publique o Apps Script na planilha e cole a URL no código.<br>' +
+        'Enquanto isso, fale conosco pelo WhatsApp abaixo.'
       );
       btn.textContent = textoOriginal;
       btn.disabled = false;

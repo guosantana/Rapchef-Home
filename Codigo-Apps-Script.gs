@@ -16,6 +16,14 @@
 const SHEET_NAME = "Página1";
 
 /**
+ * CABEÇALHOS esperados na primeira linha da planilha (nesta ordem):
+ *   Timestamp | Nome | WhatsApp | Cidade | Experiência
+ *
+ * Se a planilha estiver VAZIA (sem cabeçalhos), o script não funcionará.
+ * Certifique-se de que a primeira linha contenha os cabeçalhos acima.
+ */
+
+/**
  * Recebe os dados via POST e salva na planilha.
  * Aceita JSON no corpo da requisição ou parâmetros de formulário.
  */
