@@ -9,9 +9,23 @@
   <meta property="og:type" content="website" />
   <title>Modelo Home RapChef — Seu Negócio de Marmitas em Casa</title>
 
-  <!-- META PIXEL CODE -->
-  <!-- Inserir código do Meta Pixel aqui -->
-  <!-- END META PIXEL CODE -->
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1648612916228363');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1648612916228363&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1840,7 +1854,7 @@
    *    EXEMPLO: var SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKf.../exec";
    * ============================================================
    */
-  var SHEETS_WEBAPP_URL = ""; // ← COLE AQUI a URL do Web App (começa com https://script.google.com/macros/s/...)
+  var SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwOx4G9dM88J-siIohxKLKL1Y-3dgHtWxjDvRJx5zSYnrntQOSInWXX1eY24qZ7WSj_/exec";
 
   function mostrarFeedback(tipo, msg) {
     var el = document.getElementById('formFeedback');
@@ -1893,6 +1907,7 @@
             'Entraremos em contato em até 24h pelo WhatsApp.'
           );
           document.getElementById('leadForm').reset();
+          if (typeof fbq === 'function') { fbq('track', 'Lead'); }
         };
       }
 
