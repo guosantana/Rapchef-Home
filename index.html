@@ -1282,7 +1282,7 @@
 
     <div class="hero-visual">
       <div class="hero-video-wrap">
-        <video id="video-hero" autoplay muted loop playsinline src="video-israel.mp4" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;"></video>
+        <video id="video-hero" autoplay muted loop playsinline src="video-israel.mp4" type="video/mp4" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">Seu navegador não suporta vídeo.</video>
         <div class="video-controls">
           <button class="video-ctrl-btn" onclick="toggleVideoPlay('video-hero', this)" title="Play/Pause" aria-label="Play/Pause">
             <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
@@ -1552,7 +1552,7 @@
     <div class="depo-wrap">
       <div class="depo-card">
         <div class="depo-video-placeholder" style="padding:0; overflow:hidden; position:relative;">
-          <video id="video-depo" autoplay muted loop playsinline src="video-depoimento.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+          <video id="video-depo" autoplay muted loop playsinline src="video-depoimento.mp4" type="video/mp4" style="width:100%; height:100%; object-fit:cover;">Seu navegador não suporta vídeo.</video>
           <div class="video-controls">
             <button class="video-ctrl-btn" onclick="toggleVideoPlay('video-depo', this)" title="Play/Pause" aria-label="Play/Pause">
               <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
@@ -1712,6 +1712,20 @@
     v.muted = !v.muted;
     btn.innerHTML = v.muted ? SVG_MUTED : SVG_SOUND;
   }
+
+  /* Sincroniza botões com estado real do vídeo */
+  document.querySelectorAll('video[id]').forEach(function(v) {
+    var wrap = v.parentElement;
+    var playBtn = wrap.querySelector('.video-ctrl-btn[onclick*="Play"]');
+    v.addEventListener('play', function() {
+      if (playBtn) playBtn.innerHTML = SVG_PAUSE;
+    });
+    v.addEventListener('pause', function() {
+      if (playBtn) playBtn.innerHTML = SVG_PLAY;
+    });
+    /* Se autoplay falhou, corrige ícone do botão */
+    if (v.paused && playBtn) playBtn.innerHTML = SVG_PLAY;
+  });
 
   /* Smooth scroll para formulário */
   document.querySelectorAll('a[href="#formulario"]').forEach(function(link) {
