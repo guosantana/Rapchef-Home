@@ -575,7 +575,7 @@
 
     .kit-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 18px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--gray-light);
@@ -583,10 +583,15 @@
     .kit-item:last-child { border-bottom: none; padding-bottom: 0; }
 
     .kit-icon {
-      width: 100px; height: 100px;
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
-      object-fit: contain;
-      display: block;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(139,0,0,0.2);
     }
 
     .kit-item-text strong {
@@ -1401,49 +1406,49 @@
         <h2 class="section-title">Tudo que você precisa para começar a vender ainda esta semana.</h2>
         <ul class="kit-list">
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/1 freezer horizontal.png" alt="Freezer Home" />
+            <div class="kit-icon">🧊</div>
             <div class="kit-item-text">
               <strong>1 Freezer Home</strong>
               <span>Equipamento para armazenar as marmitas em casa</span>
             </div>
           </li>
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/1000 refeiçoes.png" alt="Refeições ultracongeladas" />
+            <div class="kit-icon">🍱</div>
             <div class="kit-item-text">
               <strong>1.000 refeições ultracongeladas</strong>
               <span>Mix dos pratos mais vendidos da linha RapChef</span>
             </div>
           </li>
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/manual de operacao.png" alt="Manual de operação" />
+            <div class="kit-icon">📋</div>
             <div class="kit-item-text">
               <strong>Manual de operação completo</strong>
               <span>Tudo que você precisa saber para operar do zero</span>
             </div>
           </li>
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/Treinamento.png" alt="Treinamento" />
+            <div class="kit-icon">🎓</div>
             <div class="kit-item-text">
               <strong>Treinamento incluso</strong>
               <span>Como vender no iFood, Instagram e WhatsApp</span>
             </div>
           </li>
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/cardápio digital.png" alt="Cardápio digital" />
+            <div class="kit-icon">📱</div>
             <div class="kit-item-text">
               <strong>Cardápio digital</strong>
               <span>Pronto para publicar nas suas redes sociais</span>
             </div>
           </li>
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/suporte.png" alt="Suporte WhatsApp" />
+            <div class="kit-icon">💬</div>
             <div class="kit-item-text">
               <strong>Suporte via WhatsApp</strong>
               <span>Time RapChef disponível para te ajudar</span>
             </div>
           </li>
           <li class="kit-item fade-up">
-            <img class="kit-icon" src="icons/material de embalagem.png" alt="Material de embalagem" />
+            <div class="kit-icon">📦</div>
             <div class="kit-item-text">
               <strong>Material de embalagem</strong>
               <span>Identidade visual para os seus pedidos</span>
@@ -1695,14 +1700,13 @@
           </div>
 
           <div class="form-group">
-            <label for="capital">Qual o seu capital de investimento?</label>
+            <label for="capital">Qual o seu Capital de Investimento?</label>
             <select id="capital" name="capital">
               <option value="" disabled selected>Selecione uma opção</option>
-              <option value="ate-5k">Até R$5.000 reais</option>
-              <option value="5k-a-10k">R$ 5.000 a R$ 10.000 reais</option>
-              <option value="10k-a-20k">R$ 10.000 a R$ 20.000 reais</option>
-              <option value="20k-a-30k">R$ 20.000 a R$ 30.000 reais</option>
-              <option value="acima-30k">Acima de R$ 30.000 reais</option>
+              <option value="ate-1000">Até R$ 1.000</option>
+              <option value="1000-3000">R$ 1.000 a R$ 3.000</option>
+              <option value="3000-5000">R$ 3.000 a R$ 5.000</option>
+              <option value="acima-5000">Acima de R$ 5.000</option>
             </select>
           </div>
 
@@ -1866,7 +1870,7 @@
    *    EXEMPLO: var SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKf.../exec";
    * ============================================================
    */
-  var SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbywr3rdcQyIFc74AsLsJMZ_Q7LpFij0svCvbP5xo0TulkLOOD5hg9au-61vGpb5QDtX/exec";
+  var SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzwJWIeO521-DcqwFseoqVL9r4DS6_xjHJR0hwPyFVixtSSYmQo16rnPOPcqFp1PlYB/exec";
 
   function mostrarFeedback(tipo, msg) {
     var el = document.getElementById('formFeedback');
