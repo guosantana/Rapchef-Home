@@ -20,8 +20,9 @@ const SHEET_NAME = "Página1";
  *   B: Email
  *   C: Whatsapp (com DDD)
  *   D: Cidade/Estado
- *   E: Você já tem experiência com delivery ou venda online?
- *   F: Data/Hora
+ *   E: Qual seu capital de investimento?
+ *   F: Você já tem experiência com delivery ou venda online?
+ *   G: Data/Hora
  */
 
 function doPost(e) {
@@ -39,6 +40,7 @@ function doPost(e) {
     var email       = (dados.email       || "").trim();
     var whatsapp    = (dados.whatsapp    || "").trim();
     var cidade      = (dados.cidade      || "").trim();
+    var capital     = (dados.capital     || "").trim();
     var experiencia = (dados.experiencia || "").trim();
     var timestamp   = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
@@ -51,7 +53,7 @@ function doPost(e) {
     var sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) throw new Error('Aba "' + SHEET_NAME + '" não encontrada');
 
-    sheet.appendRow([nome, email, whatsapp, cidade, experiencia, timestamp]);
+    sheet.appendRow([nome, email, whatsapp, cidade, capital, experiencia, timestamp]);
 
     return ContentService
       .createTextOutput(JSON.stringify({ success: true, message: "Lead salvo!" }))
